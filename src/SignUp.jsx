@@ -1,7 +1,41 @@
-import React from "react";
+import React, { useReducer, useState, useEffect } from "react";
 import styled from "styled-components";
+import { useSelector, useDispatch } from "react-redux";
+import { increment, decrement, replaceByNumber } from "./redux/counterSlice";
+import store from "./store";
+
+const CountReducer = (state, action) => {
+  switch (action.type) {
+    case "increment":
+      return state + 1;
+    case "decrement":
+      return state - 1;
+    case "replace":
+      return action.payload;
+    default:
+      return state;
+  }
+};
 
 const SignUp = () => {
+  const [value, toggleValue] = useReducer((value) => !value, false);
+  const [count, dispatchCountAction] = useReducer(CountReducer, 0);
+
+  const counter = useSelector((state) => state.counter.value);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const unsubscribe = store.subscribe(() => {
+      const counter = store.getState().counter;
+      if(counter % 2 === 0) {
+        alert("Counter is even");
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   return (
     <Wrapper bgcolor="rgb(229,231,235)">
       <MainContainer>
@@ -12,8 +46,16 @@ const SignUp = () => {
             <br />
             Join the club now.
           </Heading>
-          <CustomInput name="FullName" placeholder="Full Name" />
-          <CustomInput name="PhoneNumber" placeholder="Phone Number" />
+          <CustomInput
+            name="FullName"
+            placeholder="Full Name"
+            value={counter}
+            onChange={(e) => {
+              // dispatchCountAction({type: "replace", payload: parseInt(e.target.value)})
+              store.dispatch(replaceByNumber(parseInt(e.target.value)));
+            }}
+          />
+          {/* <CustomInput name="PhoneNumber" placeholder="Phone Number" />
           <CustomInput name="Email" placeholder="Email" />
           <CustomInput
             name="Password"
@@ -25,6 +67,29 @@ const SignUp = () => {
             placeholder="Password Confirmation"
             isFieldTextHidden
           />
+          <input
+            type="checkbox"
+            name="terms"
+            checked={value}
+            onChange={toggleValue}
+          /> */}
+          <p>{count}</p>
+          <button
+            onClick={() => {
+              // dispatchCountAction({ type: "increment" });
+              store.dispatch(increment());
+            }}
+          >
+            Increment
+          </button>
+          <button
+            onClick={() => {
+              // dispatchCountAction({ type: "decrement" })
+              store.dispatch(decrement());
+            }}
+          >
+            Decrement
+          </button>
           <JoinNowButton>Join Now</JoinNowButton>
         </FormContainer>
       </MainContainer>
@@ -102,10 +167,15 @@ const StylizedCustomInput = styled.div`
   }
 `;
 
-const CustomInput = ({ name, placeholder, isFieldTextHidden }) => {
+const CustomInput = ({
+  name,
+  placeholder,
+  isFieldTextHidden,
+  ...inputProps
+}) => {
   return (
     <StylizedCustomInput>
-      <input name={name} placeholder={placeholder} />
+      <input name={name} placeholder={placeholder} {...inputProps} />
       {isFieldTextHidden === undefined ? null : !!isFieldTextHidden ? (
         <img src="./view.png" alt="View Password" />
       ) : (

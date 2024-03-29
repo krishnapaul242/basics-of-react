@@ -1,11 +1,6 @@
-import Registration from "./Registration";
-import SignUp from "./SignUp";
-
+import ProductList from "./productList";
 function App() {
-  return (
-    // <Registration />
-    <SignUp />
-  );
+  return <ProductList />;
 }
 
 export default App;
