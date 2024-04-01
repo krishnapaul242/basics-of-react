@@ -2,6 +2,7 @@ import React, { useReducer } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { clearCart, removeFromCart, updateQuantity } from "./redux/cartSlice";
 import CartItem from "./CartItem";
+import { SampleAsyncThunk } from "./sampleAsyncTask";
 
 const Header = () => {
   const cartData = useSelector((state) => state.cart);
@@ -22,6 +23,9 @@ const Header = () => {
   const handleRemoveCartClick = ({ id }) => {
     dispatch(removeFromCart({ id }));
   };
+  const handleCheckoutClick = () => {
+    dispatch(SampleAsyncThunk({time: 5, taskName: "Test Task"}))
+  }
   const handleQuantityChange = (id) => (quantity) => {
     if (quantity === 0 || quantity < 0) {
       dispatch(removeFromCart({ id }));
@@ -49,7 +53,10 @@ const Header = () => {
         >
           {collapsed ? "Show Cart Items" : "Hide Cart Items"}
         </button>
-        <button className="bg-green-800 text-white py-2 px-4 rounded">
+        <button
+          className="bg-green-800 text-white py-2 px-4 rounded"
+          onClick={handleCheckoutClick}
+        >
           Checkout
         </button>
       </div>
